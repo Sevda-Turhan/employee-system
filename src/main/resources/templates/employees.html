@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Personel Listesi</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        img.qr-code {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        img.qr-code:hover {
+            transform: scale(1.1);
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .dataTables_filter input {
+            border-radius: 20px;
+            padding: 5px 15px;
+            border: 1px solid #ccc;
+        }
+        #personelTablosu tbody tr:hover {
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="text-primary fw-bold fs-2">📋 Personel Listesi</h2>
+
+        <!--            <button class="btn btn-danger" onclick="generatePDF()">📄 PDF Olarak İndir</button>-->
+        <a href="/employees/add-form" class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle me-1"></i> Yeni Personel Ekle
+        </a>
+
+    </div>
+
+
+    <!-- Başarı veya Hata Mesajı -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- 🧾 Personel Tablosu -->
+    <div class="table-responsive">
+        <table id="personelTablosu" class="table table-bordered table-hover table-striped align-middle bg-white">
+            <thead class="table-success">
+
+            <tr>
+                <th>Ad</th>
+                <th>Bölüm</th>
+                <th>Rol</th>
+                <th>Personel No</th><!-- Burada QR kod yerine personelNo -->
+                <th>İşlemler</th>
+            </tr>
+
+            </thead>
+            <tbody>
+
+            <tr th:each="emp : ${employees}">
+                <td th:text="${emp.name}"></td>
+                <td th:text="${emp.department}"></td>
+                <td th:text="${emp.role}"></td>
+                <td class="text-center" th:text="${emp.personelNo}"></td> <!-- Personel No buraya -->
+
+                <td>
+                    <a th:href="@{/employees/edit/{id}(id=${emp.id})}" class="btn btn-sm btn-warning me-1" title="Düzenle">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-danger" title="Sil"
+                       th:onclick="|if(confirm('Bu personeli silmek istediğinize emin misiniz?')) location.href='/employees/delete/${emp.id}'; return false;|">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(employees)}">
+
+                <td colspan="5" class="text-center text-muted">Kayıt bulunamadı.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- QR Kod Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">QR Kod</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="qrModalImg" src="" alt="Büyük QR Kod" style="max-width:100%; height:auto;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- html2pdf CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // DataTable etkinleştirme ve Türkçe ayarları
+        $('#personelTablosu').DataTable({
+            "language": {
+                "search": "Ara:",
+                "lengthMenu": "Her sayfada _MENU_ kayıt göster",
+                "zeroRecords": "Kayıt bulunamadı",
+                "info": "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                "infoEmpty": "Kayıt yok",
+                "infoFiltered": "(_MAX_ kayıt içerisinden filtrelendi)",
+                "paginate": {
+                    "first": "İlk",
+                    "last": "Son",
+                    "next": "Sonraki",
+                    "previous": "Önceki"
+                }
+            }
+        });
+
+        // QR kod resmine tıklanınca modalda resmi ve başlığı değiştir
+        $('.qr-code').on('click', function () {
+            const src = $(this).attr('data-img');
+            const personName = $(this).closest('tr').find('td:first').text();
+            $('#qrModalLabel').text(personName + " - QR Kod");
+            $('#qrModalImg').attr('src', src);
+        });
+    });
+
+    // PDF oluşturma fonksiyonu
+    // function generatePDF() {
+    //     const element = document.querySelector('.table-responsive'); // PDF alınacak alan
+    //
+    //     const options = {
+    //         margin:       0.2,
+    //         filename:     'personel-listesi.pdf',
+    //         image:        { type: 'jpeg', quality: 0.98 },
+    //         html2canvas:  { scale: 2 },
+    //         jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+    //     };
+    //
+    //     html2pdf().set(options).from(element).save();
+    // }
+
+    // Başarı/hata mesajlarını 3 saniye sonra gizle
+    setTimeout(function () {
+        const successAlert = document.querySelector('.alert-success');
+        const errorAlert = document.querySelector('.alert-danger');
+        if (successAlert) successAlert.style.display = 'none';
+        if (errorAlert) errorAlert.style.display = 'none';
+    }, 3000);
+</script>
+
+
+</body>
+</html>

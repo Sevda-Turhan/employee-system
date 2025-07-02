@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Yeni Personel Ekle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body
+        {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .form-card {
+            max-width: 650px;
+            margin: 80px auto;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            padding: 35px;
+        }
+
+        h3 {
+            font-weight: 600;
+            color: #198754;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+
+        #error {
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+
+
+
+<div class="container">
+    <div class="form-card">
+        <h3 class="text-center mb-4">👤 Yeni Personel Ekle</h3>
+
+        <form id="employeeForm" th:action="@{/employees/add-form}" method="post" onsubmit="return checkDuplicate(event)">
+            <div class="mb-3">
+                <label for="name" class="form-label">Ad Soyad</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Örn: Ahmet Yılmaz" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="department" class="form-label">Bölüm</label>
+                <select class="form-select" id="department" name="department" required>
+                    <option value="" disabled selected>Seçiniz...</option>
+                    <option value="Personel">Personel</option>
+                    <option value="Yazılım">Yazılım</option>
+                    <option value="İK">İnsan Kaynakları</option>
+                    <option value="Satış">Satış</option>
+                    <option value="Muhasebe">Muhasebe</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="role" class="form-label">Rol</label>
+                <select class="form-select" id="role" name="role" required>
+                    <option value="" disabled selected>Seçiniz...</option>
+                    <option value="Personel">Çalışan</option>
+                    <option value="Yönetici">Yönetici</option>
+                    <option value="Stajyer">Stajyer</option>
+                    <option value="Temsilci">Temsilci</option>
+                    <option value="Operatör">Operatör</option>
+                </select>
+            </div>
+
+            <div id="error" class="alert alert-danger d-none" role="alert"></div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-success">💾 Kaydet</button>
+                <a href="/employees/view" class="btn btn-outline-secondary">↩ Geri Dön</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS + Duplicate Check -->
+<script>
+    function checkDuplicate(event) {
+        event.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const department = document.getElementById("department").value;
+
+        if (!name || !department) return;
+
+        fetch(`/employees/check-duplicate?name=${encodeURIComponent(name)}&department=${encodeURIComponent(department)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    const errorBox = document.getElementById("error");
+                    errorBox.textContent = "⚠️ Aynı isim ve bölümde kayıtlı personel zaten var!";
+                    errorBox.classList.remove("d-none");
+                } else {
+                    document.getElementById("employeeForm").submit();
+                }
+            })
+            .catch(error => {
+                console.error("Sunucu hatası:", error);
+                alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+            });
+
+        return false;
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

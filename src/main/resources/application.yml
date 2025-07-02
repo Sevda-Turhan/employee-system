@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Employee
+  datasource:
+    url: jdbc:mysql://localhost:3306/takip
+    username: root
+    password: sevdanur
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  spring:
+    jmx:
+      enabled=false:
+
+server:
+  port: 8080
