@@ -137,7 +137,7 @@ public class EmployeeService {
     }
 
     public Employee findByPersonelNo(String personelNo) {
-        return employeeRepository.findByPersonelNo(personelNo);
+        return employeeRepository.findByPersonelNo(personelNo).orElse(null);
     }
 
 

@@ -21,7 +21,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 
     Employee findByUser(User user);
-    Employee findByPersonelNo(String personelNo);
+    Optional<Employee> findByPersonelNo(String personelNo);
     Optional<Employee> findTopByOrderByIdDesc();
     boolean existsByPersonelNo(String personelNo);
 

@@ -16,8 +16,10 @@ public class Employee {
     private Long id;
     private String name;
     private String department;
+
     @Column(unique = true)
     private String personelNo;
+
     private String role;
 
     @Column(name = "attendance_date")

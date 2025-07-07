@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .requestMatchers(
 //                                "/login",                   // login sayfası
                                 "/employee-login",          // personel giriş post
-                                "/employee/**",             // personel sayfaları
+                                "/employee-view",             // personel sayfaları
                                 "/kayapen-logo.png",        // logo dosyası
                                 "/css/**", "/js/**", "/images/**", "/webjars/**"  // statik dosyalar
                         ).permitAll()

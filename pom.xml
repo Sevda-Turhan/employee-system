@@ -16,6 +16,8 @@
     <name>demo</name>
     <description>QR Kod Giriş Projesi</description>
 
+    <packaging>jar</packaging>
+
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -94,10 +96,6 @@
             <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
-
-
-
-
     </dependencies>
 
     <build>

@@ -122,17 +122,6 @@ public class EmployeeViewController {
         return "redirect:/employees/view";
     }
 
-    @GetMapping("/view/{id}")
-    public String viewEmployee(@PathVariable Long id, Model model) {
-        Employee employee = employeeService.findById(id);
-        if (employee == null) {
-            model.addAttribute("errorMessage", "Personel bulunamadı!");
-            // employee-view sayfasını döndür, burada hata mesajı gösterilecek
-            return "employee-view";
-        }
-        model.addAttribute("employee", employee);
-        return "employees-view";
-    }
 
     @PostMapping("/employees/add")
     public ResponseEntity<?> addEmployee(@RequestBody Employee employee) {
@@ -143,5 +132,27 @@ public class EmployeeViewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Hata: " + e.getMessage());
         }
     }
+    @PostMapping("/employee-view")
+    public String employeeLogin(@RequestParam String personelNo) {
+        Employee employee = employeeService.findByPersonelNo(personelNo);
+        if (employee == null) {
+            // Hata mesajıyla tekrar giriş sayfasına dön
+            return "redirect:/login?error=true";
+        }
+        // Personelin id'sine göre detay sayfasına yönlendir
+        return "redirect:/view/" + employee.getId();
+    }
+    @GetMapping("/view/{id}")
+    public String viewEmployee(@PathVariable Long id, Model model) {
+        Employee employee = employeeService.findById(id);
+        if (employee == null) {
+            model.addAttribute("errorMessage", "Personel bulunamadı!");
+            return "employee-view";  // ya da hata sayfası
+        }
+        model.addAttribute("employee", employee);
+        return "employees-view";  // detay sayfası
+    }
+
+
 
 }
